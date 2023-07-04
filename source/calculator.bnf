@@ -1,0 +1,50 @@
+/**
+ * Grammar rules for a four function calculator.  The first step is defining the
+ * terminals of the grammar.  These terminals represent the smallest unit of the
+ * language, such as a number or an operator, and are defined with the regular
+ * expression syntax.  As an example, the following line defines a number whos
+ * string consists of one or more digits.
+ *
+ *      'num' [0-9]+;
+ *
+ * Grammar rules then define the valid combinations of these terminals in the
+ * user input.  These rules are written as a nonterminal followed by zero or
+ * more symbols and ending with a semicolon.  If there is more than one rule
+ * associated the same nonterminal, they are separated by a vertical bar.  The
+ * following statement defines a multiplication to be either a number, or a
+ * previous product times a number.
+ *
+ *      mult: 'num' | mult '*' 'num';
+ *
+ * Using the previous techniques for defining grammar rules, and implementing
+ * their associated functions, the following lists the full grammar of our
+ * calculator.  The parser generator reads this grammar and outputs the source
+ * code of action tables.  These action tables define which functions to call
+ * while the calculator is reading the input expressions.  These action tables
+ * are then compiled along with the user defined functions to build a calculator
+ * program.
+ */
+
+#include "calculator.hpp"
+
+/* Integer Values */
+'num'<Value>  [0-9]+                 &scan_num;
+'hex'<Value>  0x([0-9]|[A-F]|[a-f])+ &scan_hex;
+'hex'<Value>  0h([0-9]|[A-F]|[a-f])+ &scan_hex;
+
+/* Grammar Rules */
+total<Value>: add        &reduce_total
+    ;
+add<Value>: mul
+    | add '+' mul       &reduce_add_mul
+    | add '-' mul       &reduce_sub_mul
+    ;
+mul<Value>: int
+    | mul '*' int       &reduce_mul_int
+    | mul '/' int       &reduce_div_int
+    | '(' add ')'       &reduce_paren
+    ;
+int<Value>: 'num'
+    | 'hex'
+    ;
+
