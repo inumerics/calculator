@@ -9,20 +9,25 @@ using std::unique_ptr;
  * For terminals that specify an associated class, these functions takes the
  * matched string from the input and returns a value of that class.
  */
-unique_ptr<Value>
-scan_num(Table* table, const std::string& text)
-{
-    return std::make_unique<Value>(std::stoi(text));
+unique_ptr<Num>
+scan_num(Table* table, const std::string& text) {
+    return std::make_unique<Num>(std::stoi(text));
 }
 
-unique_ptr<Value>
+unique_ptr<Num>
 scan_hex(Table* table, const std::string& text)
 {
     std::stringstream stream;
     stream << std::hex << text;
+
     int num = 0;
     stream >> num;
-    return std::make_unique<Value>(num);
+    return std::make_unique<Num>(num);
+}
+
+unique_ptr<Ident>
+scan_ident(Table* table, const std::string& text) {
+    return std::make_unique<Ident>(text);
 }
 
 /**
@@ -31,60 +36,74 @@ scan_hex(Table* table, const std::string& text)
  * If any function is not implemented, including with the exact argument types,
  * then link errors will occur when building the final program.
  */
-unique_ptr<Value>
-reduce_total(Table* table,
-             unique_ptr<Value>& E1)
-{
-    unique_ptr<Value> result = std::move(E1);
-    std::cout << result->value << "\n";
-    return result;
+unique_ptr<Num>
+reduce_total(Table* table, unique_ptr<Num>& E1) {
+    return std::move(E1);
 }
 
-unique_ptr<Value>
+unique_ptr<Num>
+reduce_line(Table* table, unique_ptr<Num>& E1) {
+    return std::move(E1);
+}
+
+unique_ptr<Num>
+reduce_assign(Table* table, 
+              unique_ptr<Ident>& E1, 
+              unique_ptr<Num>& E2) {
+    table->vars[E1->name] = E2->value;
+    return std::move(E2);
+}
+
+unique_ptr<Num>
+reduce_exit(Table* table) {
+    table->done = true;
+    return std::make_unique<Num>(0);
+}
+
+unique_ptr<Num>
 reduce_add_mul(Table* table,
-               unique_ptr<Value>& E1,
-               unique_ptr<Value>& E2)
-{
-    unique_ptr<Value> result = std::move(E1);
+               unique_ptr<Num>& E1,
+               unique_ptr<Num>& E2) {
+    unique_ptr<Num> result = std::move(E1);
     result->value += E2->value;
     return result;
 }
 
-unique_ptr<Value>
+unique_ptr<Num>
 reduce_sub_mul(Table* table,
-               unique_ptr<Value>& E1,
-               unique_ptr<Value>& E2)
-{
-    unique_ptr<Value> result = std::move(E1);
+               unique_ptr<Num>& E1,
+               unique_ptr<Num>& E2) {
+    unique_ptr<Num> result = std::move(E1);
     result->value -= E2->value;
     return result;
 }
 
-unique_ptr<Value>
+unique_ptr<Num>
 reduce_mul_int(Table* table,
-               unique_ptr<Value>& E1,
-               unique_ptr<Value>& E2)
-{
-    unique_ptr<Value> result = std::move(E1);
+               unique_ptr<Num>& E1,
+               unique_ptr<Num>& E2) {
+    unique_ptr<Num> result = std::move(E1);
     result->value *= E2->value;
     return result;
 }
 
-unique_ptr<Value>
+unique_ptr<Num>
 reduce_div_int(Table* table,
-               unique_ptr<Value>& E1,
-               unique_ptr<Value>& E2)
-{
-    unique_ptr<Value> result = std::move(E1);
+               unique_ptr<Num>& E1,
+               unique_ptr<Num>& E2) {
+    unique_ptr<Num> result = std::move(E1);
     result->value /= E2->value;
     return result;
 }
 
-unique_ptr<Value>
-reduce_paren(Table* table,
-             unique_ptr<Value>& E1)
-{
+unique_ptr<Num>
+reduce_paren(Table* table, unique_ptr<Num>& E1) {
     return std::move(E1);
+}
+
+unique_ptr<Num>
+reduce_lookup(Table* table, unique_ptr<Ident>& E1) {
+    return std::make_unique<Num>(table->vars[E1->name]);
 }
 
 /**

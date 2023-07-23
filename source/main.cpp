@@ -8,41 +8,40 @@
  * onto the stack, or if the stack is reduced by a rule of the grammar.
  */
 int
-main(int argc, const char* argv[])
-{
-    if (argc != 2) {
-        std::cerr << "Expected a single input string.\n";
-        return 1;
-    }
+main(int argc, const char * argv[])
+{    
+    Table table;
 
     Calculator calculator;
     calculator.start();
+    std::cout << "> ";
 
-    Table table;
-
-    std::stringstream in(argv[1]);
-
-    std::unique_ptr<Value> result;
-
-    while (true) {
-        int c = in.get();
-        if (c == EOF) {
-            result = calculator.scan_end(&table);
+    while (!table.done) 
+    {
+        int c = std::cin.get();
+        if (c == '\n') {
+            std::unique_ptr<Value> result = calculator.scan_end(&table);
             if (!result) {
                 std::cerr << "Unexpected end of the input.\n";
                 return 1;
             }
-            break;
-        }
+            if (!table.done) {
+                std::unique_ptr<Num> num(dynamic_cast<Num*>(result.release()));
+
+                std::cout << num->value << "\n";
+                calculator.start();
+                std::cout << "> ";
+            }
+        } 
         else {
             bool ok = calculator.scan(&table, c);
             if (!ok) {
-                std::cerr << "Unexpected character.\n";
+                std::cerr << "Unexpected character '" << c <<  "'.\n";
                 return 1;
             }
         }
     }
-
+    
     return 0;
 }
 
