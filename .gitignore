@@ -1,5 +1,2 @@
-.vs/
-*.vcxproj.user
-Debug/
-Release/
 xcuserdata/
+.DS_Store
