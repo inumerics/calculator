@@ -1,16 +1,16 @@
-# Parser Generator
+# Parser Generators
 
-A parser generator simplifies the development of programs such as calculators
-and compilers by writing the source code for parsing input text.  The generator
-takes a user defined grammar and builds tables that define which functions
-to call while reading the input.  These tables along with the user provided 
-functions are then compiled together to build the final program.
+A parser generator simplifies the development of programs, such as calculators 
+and compilers, by generating the source code needed for parsing input text. The 
+generator accepts a user-defined grammar and constructs tables which dictate 
+which functions to invoke while processing the input. These tables, combined 
+with user-provided functions, are then compiled to produce the final program.
 
-A common way to define a context free grammar is the Backus-Naur Form.  The
-grammar is defined by two types of symbols: terminals and nonterminals.  The
-terminals are shown in quotes and are defined by a regular expression.  The
-nonterminals are a sequence of symbols known as a production rule.  The
-following text is an example grammar for a four function calculator.
+A popular method for defining a context-free grammar is the Backus-Naur Form. 
+This grammar is characterized by two types of symbols: terminals and 
+nonterminals. Terminals are enclosed in quotes and are represented by regular 
+expressions, while nonterminals consist of sequences of symbols known as 
+production rules. Below is an example grammar for a four-function calculator.
 
 ```
 'num'<Expr>  [0-9]+     &scan_num;
@@ -27,6 +27,26 @@ mul<Expr>: num
     | '(' add ')'       &reduce_paren
     ;
 ```
+
+## Example Calculator Program
+
+This source code serves as an example program that includes both a grammar and 
+functions to implement a four-function calculator. Given the language of the 
+calculator as input, the parser program generates action tables. These tables 
+are then compiled alongside user-defined functions to construct the calculator 
+program.
+
+- [Grammar](https://github.com/inumerics/calculator/blob/main/source/calculator.bnf)
+- [Header ](https://github.com/inumerics/calculator/blob/main/source/calculator.hpp)
+- [Source ](https://github.com/inumerics/calculator/blob/main/source/calculator.cpp)
+
+## Parser Generator Binary
+
+The first step in building this calculator is to download the parser generator 
+program. This program reads the grammar and generates the source code that 
+defines which functions to call when processing user input.
+
+- [Island Numerics Parser](https://islandnumerics.com)
 
 ## Defining the Terminals
 Terminals represent the smallest unit of the language, such as a number or an 
@@ -79,14 +99,3 @@ within a rule the terminal is not defined using a regular expression, but a
 series of printable characters. This simple definition allows characters which 
 are normally regular expression operators to act as a terminal in the grammar. 
 
-## Example Calculator Program
-
-This source code includes an example program with a grammar and functions that
-implement a four function calculator.  With the calculator's language as an
-input, this parser program generates the tables of actions.  These action tables 
-are then compiled along with the user defined functions to build a calculator
-program.
-
-- [Calculator Grammar](https://github.com/inumerics/calculator/blob/main/source/calculator.bnf)
-- [Calculator Header ](https://github.com/inumerics/calculator/blob/main/source/calculator.hpp)
-- [Calculator Source ](https://github.com/inumerics/calculator/blob/main/source/calculator.cpp)
